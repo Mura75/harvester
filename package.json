@@ -1,0 +1,27 @@
+{
+  "name": "harvester",
+  "version": "1.0.0",
+  "description": "Android sample project launcher ",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ant-nomad/harvester.git"
+  },
+  "keywords": [
+    "Harvester",
+    "Android"
+  ],
+  "author": "Ant Nomad",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ant-nomad/harvester/issues"
+  },
+  "homepage": "https://github.com/ant-nomad/harvester#readme",
+  "devDependencies": {
+    "electron": "^1.4.14"
+  }
+}
