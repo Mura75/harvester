@@ -10,12 +10,13 @@ import fs from 'fs';
 
 const app = express();
 const exec = child_process.exec;
+const spawn = child_process.spawn;
 
 const PORT = 3000;
 const DOWNLOADS_FOLDER = `${__dirname}/../downloads`; 
 
 let ANDROID_HOME = "";
-let currentExtractedProjectFolder = "";
+let currentExtractedProjectFolder = "picasso-master";
 
 
 app.get('/', (req, res) => {
@@ -77,13 +78,16 @@ app.get('/android_devices', (req, res) => {
    
 });
 
-
+/**
+ * This method will download github project and unzip it to specific folder
+ */
 app.get('/download', (req, res) => {
     let url = req.query.url;
     
     // There must be better URL tidying
     url = url.replace(/\"/g, "");
-    
+
+    // Getting github's repo's archive
     let zipUrl = `${url}/archive/master.zip`;
     
     if (!fs.existsSync(DOWNLOADS_FOLDER)) {
@@ -116,6 +120,7 @@ app.get('/download', (req, res) => {
 
                    // There must be additional checks this code is just for now
                    currentExtractedProjectFolder = `${DOWNLOADS_FOLDER}/${zip.getEntries()[0].entryName}`;
+                   console.log(currentExtractedProjectFolder);
 
                    res.json({status: 'success', data: 'project is ready'})
                 });
@@ -123,6 +128,178 @@ app.get('/download', (req, res) => {
     });
 
 
+});
+
+
+/**
+ * This method will try to build downloaded project. /download should be called before
+ */
+app.get('/build', (req, res) => {
+    if (currentExtractedProjectFolder.length == 0) {
+        res.json({status: 'error', data: 'Project is not extracted'});
+    }
+    
+    if (currentExtractedProjectFolder[currentExtractedProjectFolder.length - 1] === "/")
+        currentExtractedProjectFolder = currentExtractedProjectFolder.slice(0, -1);
+    
+    let command = "gradlew";
+    if (process.platform === "win32")
+        command = "gradlew.bat";
+    
+    let gradlew = spawn(command, ['assembleDebug', '--stacktrace'], {cwd: `${currentExtractedProjectFolder}`});
+
+    gradlew.stdout.on('data', (data) => {
+        console.log("stdout: " + data);
+        res.write(JSON.stringify({status: 'success', data: data.toString()}))
+    });
+
+    gradlew.stderr.on('data', (data) => {
+        console.log('stderr: ' + data);
+        res.write(JSON.stringify({status: 'error', data: data.toString()}))
+    });
+
+
+    gradlew.on('exit', (code) => {
+        if (code == "0")
+            res.end(JSON.stringify({status: 'success', data: 'Build is successful'}));
+        else
+            res.end(JSON.stringify({status: 'error', data: 'Project was not built'}));
+    });
+
+    gradlew.on('error', (error) => {
+        console.log("ERROR: " + error);
+        res.json({status: 'error', data: error});
+    });
+    
+});
+
+
+/**
+ * This method will launch built apk file. /build should be called before
+ */
+app.get('/launch', (req, res) => {
+    let deviceId = req.query.deviceId;
+    
+    if (ANDROID_HOME.length === 0) {
+        res.json({status: 'error', data: 'ANDROID_HOME is not set'});
+        return;
+    }
+    
+    if (!deviceId) {
+        res.json({status: 'error', data: 'device is not set'});
+        return;
+    }
+    
+    if (currentExtractedProjectFolder.length === 0) {
+        res.json({status: 'error', data: 'project is not set'});
+        return;
+    }
+    
+    let apkPath = searchForApk(`${currentExtractedProjectFolder}`);
+    
+    if (apkPath.length === 0) {
+        res.json({status: 'error', data: 'project is not built'});
+        return;
+    }
+    
+
+    let buildToolsFolder = fs.readdirSync(`${ANDROID_HOME}/build-tools`);
+    if (buildToolsFolder.length === 0) {
+        res.json({status: 'error', data: 'no build-tools'});
+    }
+
+    let buildTool = buildToolsFolder[0];
+
+    let aaptCommand = `${path.normalize(ANDROID_HOME)}/build-tools/${buildTool}/aapt dump --values badging ${apkPath}`;
+    if (process.platform === "win32") {
+        apkPath = apkPath.replace(/\//g, "\\");
+        aaptCommand = `"${path.normalize(ANDROID_HOME)}\\build-tools\\${buildTool}\\aapt" dump --values badging "${apkPath}"`;
+    }
+
+    exec(aaptCommand, (error, stdout, stderr) => {
+        
+        if (error) {
+            res.json({status: 'error', data: error});
+            return;
+        }
+
+        let aaptLines = stdout.split('\n');
+        let packageLine = "";
+        let launchableActivityLine = "";
+        for (let i = 0; i < aaptLines.length; i++) {
+            if (aaptLines[i].indexOf("package") !== -1) {
+                packageLine = aaptLines[i];
+            } else if (aaptLines[i].indexOf("launchable-activity:") !== -1) {
+                launchableActivityLine = aaptLines[i];
+                break;
+            }
+        }
+            
+        let packageName = packageLine.substring(packageLine.indexOf("name=\'") + 6, packageLine.indexOf("\' versionCode"));
+        
+        let launchableActivity = launchableActivityLine.substring(
+                                                launchableActivityLine.indexOf("name=\'") + 6,
+                                                launchableActivityLine.indexOf("\'  label=\'"));
+        console.log(aaptLines);
+        console.log("ACTIVITY " + packageName + " " + launchableActivity);
+        
+        res.write(JSON.stringify({status: 'success', data: 'Package and activity found'}));
+
+        let install = spawn("adb", ["-s", deviceId, "install", apkPath], {cwd: `${path.normalize(ANDROID_HOME)}/platform-tools`});
+        
+        install.stdout.on('data', (data) => {
+            console.log("install stdout: " + data);
+            res.write(JSON.stringify({status: 'success', data: data.toString()}))
+        });
+
+        install.stderr.on('data', (data) => {
+            console.log('install stderr: ' + data);
+            res.write(JSON.stringify({status: 'error', data: data.toString()}))
+        });
+
+
+        install.on('exit', (code) => {
+            if (code == "0") {
+                res.write(JSON.stringify({status: 'success', data: 'Install is successful'}));
+                
+                
+                res.write(JSON.stringify({status: 'success', data: 'Trying to launch'}));
+                
+                let launch = spawn("adb", 
+                    ["-s", deviceId, "shell", "am", "start", "-n", `${packageName}/${launchableActivity}`], 
+                    {cwd: `${path.normalize(ANDROID_HOME)}/platform-tools`});
+
+                launch.stdout.on('data', (data) => {
+                    console.log("launch stdout: " + data);
+                    res.write(JSON.stringify({status: 'success', data: data.toString()}))
+                });
+
+                launch.stderr.on('data', (data) => {
+                    console.log('launch stderr: ' + data);
+                    res.write(JSON.stringify({status: 'error', data: data.toString()}))
+                });
+                
+                launch.on('exit', (code) => {
+                    if (code == "0")
+                        res.end(JSON.stringify({status: 'success', data: 'Launched'}));
+                    else
+                        res.end(JSON.stringify({status: 'error', data: 'Launch failed'}));
+                });
+
+                launch.on('error', (error) => {
+                    console.log("ERROR: " + error);
+                    res.end(JSON.stringify({status: 'error', data: error}));
+                });
+            }
+            else
+                res.end(JSON.stringify({status: 'error', data: 'Install failed'}));
+        });
+
+        install.on('error', (error) => {
+            console.log("ERROR: " + error);
+            res.end(JSON.stringify({status: 'error', data: error}));
+        });
+    });
 });
 
 
@@ -135,6 +312,25 @@ function resolveWindowsPath (str) {
     }
 
     return str.replace(/\\/g, '/');
+}
+
+function searchForApk(dir) {
+    var result = "";
+    var files = fs.readdirSync(dir);
+
+    for (var i = 0; i < files.length; i++) {
+        var element = files[i];
+        if (element.indexOf(".") === -1 && fs.statSync(dir + "/" + element).isDirectory()) {
+            result = searchForApk(dir + "/" + element);
+            if (result.length > 0)
+                return result;
+        } else if (element.indexOf('-debug.apk') > -1){
+            console.log("FOUND IT " + dir + "/"+ element);
+            result = dir + "/" + element;
+            return result;
+        }
+    }
+    return result;
 }
 
 
