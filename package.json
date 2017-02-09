@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
     "build": "webpack --progress --colors --config webpack.config.js",
-    "webpack-devserver": "webpack-dev-server --debug --hot --devtool eval-source-map --output-pathinfo --watch --colors --inline --content-base public --port 8050 --host 0.0.0.0",
+    "webpack-devserver": "webpack-dev-server --debug --hot --devtool eval-source-map --watch-poll --colors --inline --port 8050 --host 0.0.0.0",
     "web": "babel-node ./scripts/server.js --presets es2015,stage-0"
   },
   "repository": {
@@ -42,8 +42,10 @@
     "babel-preset-react": "^6.16.0",
     "babel-preset-stage-0": "^6.16.0",
     "express": "^4.14.0",
+    "oboe": "^2.1.3",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
-    "request": "^2.79.0"
+    "request": "^2.79.0",
+    "whatwg-fetch": "^2.0.2"
   }
 }

@@ -5,12 +5,13 @@ var WebpackNotifierPlugin = require('webpack-notifier');
 module.exports = {
     devtool: 'eval',
     // This will be our app's entry point (webpack will look for it in the 'src' directory due to the modulesDirectory setting below). Feel free to change as desired.
-    entry: ['./scripts/client.js'],
+    entry: ['./scripts/client/client.js'],
     // Output the bundled JS to dist/app.js
     output: {
         filename: 'bundle.js',
         //path: path.resolve('dist')
-        path : `${__dirname}/public/assets/`
+        path : `${__dirname}/public/assets/`,
+        publicPath: '/public/assets/'
     },
     resolve: {
         root: path.join(__dirname, 'scripts'),
@@ -30,7 +31,7 @@ module.exports = {
         new WebpackNotifierPlugin({ alwaysNotify: true }),
     ],
     devServer: {
-        headers: { 'Access-Control-Allow-Origin': '*' }
+        headers: { 'Access-Control-Allow-Origin': '*' },
     },
     watch : true
 };

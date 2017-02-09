@@ -19,8 +19,18 @@ let ANDROID_HOME = "";
 let currentExtractedProjectFolder = "picasso-master";
 
 
+let allowCrossDomainLocalhost = (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+    next();
+};
+
+app.use(allowCrossDomainLocalhost);
+
 app.get('/', (req, res) => {
-    res.send('HARVESTER');
+    res.json({status: 'success', data: "Harvester"});
 });
 
 
@@ -69,7 +79,11 @@ app.get('/android_devices', (req, res) => {
            }
        }).map((element) => {
            let parts = element.split('               ');
-           return {id: parts[0], description: parts[1]};
+           
+           let id = element.slice(0, element.indexOf('  '));
+           let description = element.slice(element.lastIndexOf('  ') + 2, element.length + 1);
+           
+           return {id: id, description: description};
        });
             
        
@@ -105,8 +119,9 @@ app.get('/download', (req, res) => {
         return;
     });
     download.on('response', (response) => {
-        if (response.statusCode != 200)
+        if (response.statusCode != 200) {
             res.json({status: 'error', data: 'error while downloading repo'});
+        }
         else
             download.pipe(fileStream).on('close', () => {
                 fileStream.close();
@@ -150,7 +165,7 @@ app.get('/build', (req, res) => {
 
     gradlew.stdout.on('data', (data) => {
         console.log("stdout: " + data);
-        res.write(JSON.stringify({status: 'success', data: data.toString()}))
+        res.write(JSON.stringify({status: 'loading', data: data.toString()}))
     });
 
     gradlew.stderr.on('data', (data) => {
@@ -249,7 +264,7 @@ app.get('/launch', (req, res) => {
         
         install.stdout.on('data', (data) => {
             console.log("install stdout: " + data);
-            res.write(JSON.stringify({status: 'success', data: data.toString()}))
+            res.write(JSON.stringify({status: 'loading', data: data.toString()}))
         });
 
         install.stderr.on('data', (data) => {
