@@ -20,8 +20,9 @@ class BuildRepo extends Component {
         
         this.oboe = oboe(`${this.props.baseUrl}/build`)
             .node('{status data}', (json) => {
-                
-                   if (json.status === 'loading') {
+                   
+                    if (json.status === 'loading') {
+                        this.setState({condition: CONDITION_STARTED});
                         if (json.data.length > 2)
                             this.setState({message: json.data});
                         else
@@ -56,7 +57,7 @@ class BuildRepo extends Component {
             else 
                 return <h1>Building...</h1>;
         else if (this.state.condition === CONDITION_ERROR)
-            return <h1>Error: {this.state.message}. <button onClick={this.props.restart}>Start Again</button></h1>;
+            return <h1>Error: {this.state.message}. <button onClick={this.props.restartApp}>Start Again</button></h1>;
         else if (this.state.condition === CONDITION_FINISHED)
             return <h1>Finished BUILDING</h1>;
     }

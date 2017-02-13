@@ -5,7 +5,7 @@ class ChooseDevices extends Component {
     constructor(props) {
         super(props);
         
-        this.state = {devices: [], status: 'success'};
+        this.state = {devices: [], status: 'success', message: ''};
         
         this.refreshDevices = this.refreshDevices.bind(this);
         this.setDevice = this.setDevice.bind(this);

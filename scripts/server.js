@@ -161,6 +161,7 @@ app.get('/build', (req, res) => {
     if (process.platform === "win32")
         command = "gradlew.bat";
     
+    console.log(currentExtractedProjectFolder);
     let gradlew = spawn(command, ['assembleDebug', '--stacktrace'], {cwd: `${currentExtractedProjectFolder}`});
 
     gradlew.stdout.on('data', (data) => {
@@ -183,7 +184,7 @@ app.get('/build', (req, res) => {
 
     gradlew.on('error', (error) => {
         console.log("ERROR: " + error);
-        res.json({status: 'error', data: error});
+        res.json({status: 'error', data: error.errno});
     });
     
 });

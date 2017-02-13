@@ -41,7 +41,7 @@ class DownloadRepo extends Component {
         else if (this.state.condition === CONDITION_FINISHED)
             return <h1>Downloaded</h1>;
         else if (this.state.condition === CONDITION_ERROR)
-            return <h1>Error when downloading repo. {this.state.message}. <button onClick={this.props.restart}>Start Again</button></h1>
+            return <h1>Error when downloading repo. {this.state.message}. <button onClick={this.props.restartApp}>Start Again</button></h1>
     }
 }
 

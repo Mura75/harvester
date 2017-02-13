@@ -52,9 +52,9 @@ class LaunchRepo extends Component {
         if (this.state.condition === CONDITION_STARTED)
             return <h1>Launching {this.state.message.length > 1 ? this.state.message : '...'}</h1>;
         else if (this.state.condition === CONDITION_ERROR)
-            return <h1>Error: {this.state.message}, <button onClick={this.props.restart}>Start Again</button></h1>;
+            return <h1>Error: {this.state.message}, <button onClick={this.props.restartApp}>Start Again</button></h1>;
         else if (this.state.condition === CONDITION_FINISHED)
-            return <h1>Launched <button onClick={this.props.restart}>Start Again</button></h1>;
+            return <h1>Launched <button onClick={this.props.restartApp}>Start Again</button></h1>;
     }
     
 }
