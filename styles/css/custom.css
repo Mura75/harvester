@@ -1,0 +1,6 @@
+.centerScreen {
+    position: absolute;
+    top: 50%;
+}
+
+body { padding-top: 30px; }

@@ -2,6 +2,8 @@ import React, {Component} from 'react'
 import "whatwg-fetch"
 import oboe from "oboe"
 
+import {Button, PageHeader, Image, Alert} from "react-bootstrap"
+
 const CONDITION_STARTED = 0;
 const CONDITION_FINISHED = 1;
 const CONDITION_ERROR = 2;
@@ -12,10 +14,9 @@ class BuildRepo extends Component {
         
         this.state = {condition: CONDITION_STARTED, message: ''};
         
-        this.startBuilding = this.startBuilding.bind(this);
     }
     
-    startBuilding() {
+    startBuilding = () => {
         console.log("STARTED BUILDING");
         
         this.oboe = oboe(`${this.props.baseUrl}/build`)
@@ -39,7 +40,7 @@ class BuildRepo extends Component {
                 
             });
         
-    }
+    };
     
     componentDidMount() {
         this.startBuilding();
@@ -52,14 +53,30 @@ class BuildRepo extends Component {
     
     render() {
         if (this.state.condition === CONDITION_STARTED)
-            if (this.state.message.length > 0)
-                return <h1>Installing {this.state.message}</h1>;
-            else 
-                return <h1>Building...</h1>;
+            return (
+                <div>
+                    <PageHeader>Building..</PageHeader>
+                    <Image src="./styles/gifs/default_loading.gif" className="center-block" responsive/>
+                    {
+                        this.state.message.length > 0 ?
+                            <PageHeader><small>Installing {this.state.message}</small></PageHeader> : ""
+                    }
+                </div>
+            )
         else if (this.state.condition === CONDITION_ERROR)
-            return <h1>Error: {this.state.message}. <button onClick={this.props.restartApp}>Start Again</button></h1>;
+            return (
+                        <Alert bsStyle="danger">
+                            <h3>Error: </h3>
+                            <p>
+                                {this.state.message}
+                            </p>    
+                            <p>
+                                <Button onClick={this.props.restartApp}>Start Again</Button>
+                            </p>
+                        </Alert>
+                );
         else if (this.state.condition === CONDITION_FINISHED)
-            return <h1>Finished BUILDING</h1>;
+            return <Alert bsStyle="success"><p>Finished BUILDING</p></Alert>;
     }
 }
 

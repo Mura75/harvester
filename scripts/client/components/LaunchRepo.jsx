@@ -2,6 +2,9 @@ import React, {Component} from 'react'
 import "whatwg-fetch"
 import oboe from "oboe"
 
+import {Button, PageHeader, Image, Alert} from "react-bootstrap"
+
+
 const CONDITION_STARTED = 0;
 const CONDITION_FINISHED = 1;
 const CONDITION_ERROR = 2;
@@ -11,11 +14,9 @@ class LaunchRepo extends Component {
     constructor(props) {
         super(props);
         this.state = {condition: CONDITION_STARTED, message: ''};
-        
-        this.startLaunch = this.startLaunch.bind(this);
     }
     
-    startLaunch() {
+    startLaunch = () => {
         console.log("STARTED LAUNCHING");
         
         this.oboe = oboe(`${this.props.baseUrl}/launch?deviceId=${this.props.deviceId}`)
@@ -50,11 +51,34 @@ class LaunchRepo extends Component {
     
     render() {
         if (this.state.condition === CONDITION_STARTED)
-            return <h1>Launching {this.state.message.length > 1 ? this.state.message : '...'}</h1>;
+            return (
+            <div>
+                <PageHeader>Launching </PageHeader>
+                <Image src="./styles/gifs/default_loading.gif" className="center-block" responsive/>
+                <PageHeader><small>{this.state.message.length > 1 ? this.state.message : '...'}</small></PageHeader>
+            </div>
+            );
         else if (this.state.condition === CONDITION_ERROR)
-            return <h1>Error: {this.state.message}, <button onClick={this.props.restartApp}>Start Again</button></h1>;
+            return (
+                <Alert bsStyle="danger">
+                    <h3>Error: </h3>
+                    <p>
+                        {this.state.message}
+                    </p>
+                    <p>
+                        <Button onClick={this.props.restartApp}>Start Again</Button>
+                    </p>
+                </Alert>
+                );
         else if (this.state.condition === CONDITION_FINISHED)
-            return <h1>Launched <button onClick={this.props.restartApp}>Start Again</button></h1>;
+            return (
+                <Alert bsStyle="success">
+                    <h3>Launched </h3>
+                    <p>
+                        <Button onClick={this.props.restartApp}>Start Again</Button>
+                    </p>
+                </Alert>
+            );
     }
     
 }

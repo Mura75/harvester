@@ -1,32 +1,36 @@
 import React, {Component} from 'react'
 import "whatwg-fetch"
 
+import {InputGroup, FormControl, Button, PageHeader} from "react-bootstrap"
+
 class UrlInput extends Component {
     constructor(props) {
         super(props);
         
         this.state = {value: ''};
-        
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
     }
     
-    handleChange(event) {
+    handleChange = (event) => {
         this.setState({value: event.target.value});
-    }
+    };
     
-    handleSubmit(event) {
+    handleSubmit = (event) => {
         event.preventDefault();
         if (this.state.value.length > 0) {
             this.props.setUrlThenMoveToDevices(this.state.value);
         }
-    }
+    };
     
     render() {
         return (
             <form onSubmit={this.handleSubmit}>
-                <input type="url" placeholder="enter url" value={this.state.value} onChange={this.handleChange}/>    
-                <input type="submit" value="GO"/>
+                <PageHeader>Harvester</PageHeader>
+                <InputGroup>
+                    <FormControl type="url" placeholder="Enter url" value={this.state.value} onChange={this.handleChange}/>
+                    <InputGroup.Button>
+                        <Button type="submit" bsStyle="primary">GO</Button>
+                    </InputGroup.Button>
+                </InputGroup>
             </form>
         )
     }

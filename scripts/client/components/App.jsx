@@ -7,6 +7,8 @@ import BuildRepo from './BuildRepo'
 import LaunchRepo from './LaunchRepo'
 import "whatwg-fetch"
 
+import {Grid, Row, Col} from "react-bootstrap";
+
 const CONDITION_GET_ANDROID_HOME = 0;
 const CONDITION_SET_REPO_URL = 1;
 const CONDITION_CHOOSE_DEVICES = 2;
@@ -16,7 +18,7 @@ const CONDITION_LAUNCH_APP = 5;
 
 
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "http://localhost:5555";
 
 class App extends Component{
     constructor(props) {
@@ -24,38 +26,31 @@ class App extends Component{
 
         this.state = {condition: CONDITION_GET_ANDROID_HOME, url: '', deviceId: ''};
         
-        
-        this.restartApp = this.restartApp.bind(this);
-        this.renderUrlInput = this.renderUrlInput.bind(this);
-        this.setUrlThenMoveToDevices = this.setUrlThenMoveToDevices.bind(this);
-        this.setDeviceThenStartDownloading = this.setDeviceThenStartDownloading.bind(this);
-        this.startBuildingRepo = this.startBuildingRepo.bind(this);
-        this.startLaunchingApp = this.startLaunchingApp.bind(this);
     }
     
-    renderUrlInput() {
+    renderUrlInput = () => {
         this.setState({condition: CONDITION_SET_REPO_URL})
-    }
+    };
     
-    restartApp() {
+    restartApp = () => {
         this.setState({condition: CONDITION_GET_ANDROID_HOME});
-    }
+    };
     
-    setUrlThenMoveToDevices(url) {
+    setUrlThenMoveToDevices = (url) => {
         this.setState({url: url, condition: CONDITION_CHOOSE_DEVICES});
-    }
+    };
     
-    setDeviceThenStartDownloading(deviceId) {
+    setDeviceThenStartDownloading = (deviceId) => {
         this.setState({deviceId: deviceId, condition: CONDITION_DOWNLOAD_REPO});
-    }
+    };
     
-    startBuildingRepo() {
+    startBuildingRepo = () => {
         this.setState({condition: CONDITION_BUILD_REPO});
-    }
+    };
     
-    startLaunchingApp() {
+    startLaunchingApp = () => {
         this.setState({condition: CONDITION_LAUNCH_APP});
-    }
+    };
     
     
     render() {
@@ -73,8 +68,16 @@ class App extends Component{
             template = <BuildRepo baseUrl={BASE_URL} restartApp={this.restartApp} startLaunchingApp={this.startLaunchingApp} />;
         else if (this.state.condition === CONDITION_LAUNCH_APP)
             template = <LaunchRepo baseUrl={BASE_URL} deviceId={this.state.deviceId} restartApp={this.restartApp}/>;
+        
+        
             
-        return template;
+        return (
+                <Grid>
+                    <Row>
+                        <Col xs={12}>{template}</Col> 
+                    </Row>
+                </Grid>
+        );
     }
 }
 
