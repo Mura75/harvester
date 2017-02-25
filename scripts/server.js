@@ -13,6 +13,7 @@ module.exports = () => {
     
     const app = express();
     const exec = child_process.exec;
+    const execSync = child_process.execSync;
     const spawn = child_process.spawn;
 
     const PORT = 5555;
@@ -159,13 +160,25 @@ module.exports = () => {
             res.json({status: 'error', data: 'Project is not extracted'});
         }
 
+        // Removing extra slash in extracted project folder
         if (currentExtractedProjectFolder[currentExtractedProjectFolder.length - 1] === "/")
             currentExtractedProjectFolder = currentExtractedProjectFolder.slice(0, -1);
 
-        let command = "gradlew";
+        let command = "./gradlew";
+        
+        // If our platform is Windows. We will run *.bat file
         if (process.platform === "win32")
             command = "gradlew.bat";
-
+        else {
+            // We execute chmod in order to have an access to executable bash script
+            let chmod =  execSync('chmod -x', {cwd: `${currentExtractedProjectFolder}`});
+            if (chmod.stderr.toString()) {
+                console.log(chmod.stderr.toString());
+                res.json({status: 'error', data: chmod.stderr});
+                return;
+            }
+        }
+            
         console.log(currentExtractedProjectFolder);
         let gradlew = spawn(command, ['assembleDebug', '--stacktrace'], {cwd: `${currentExtractedProjectFolder}`});
 
