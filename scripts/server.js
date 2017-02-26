@@ -175,7 +175,7 @@ module.exports = () => {
             command = "gradlew.bat";
         else {
             // We execute chmod in order to have an access to executable bash script
-            fs.chmodSync(`${currentExtractedProjectFolder}`, '755');
+            fs.chmodSync(`${currentExtractedProjectFolder}/gradlew`, '755');
 
             params.unshift(command);
             command = "sudo";
