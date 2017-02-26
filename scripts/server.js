@@ -44,15 +44,19 @@ module.exports = () => {
     app.get('/android_path', (req, res) => {
         ANDROID_HOME = process.env.ANDROID_HOME;
 
-        let status = (ANDROID_HOME) ? "success" : "error";
-
+        if (!ANDROID_HOME) {
+            res.json({status: 'error', data: 'ANDROID_PATH does not exist'})
+            return;
+        }        
+        
+        
         if (process.platform === "win32")
             ANDROID_HOME = resolveWindowsPath(ANDROID_HOME);
         else
             ANDROID_HOME = path.resolve(ANDROID_HOME);
 
 
-        res.json({status: status, data: ANDROID_HOME});
+        res.json({status: 'success', data: ANDROID_HOME});
     });
 
 
