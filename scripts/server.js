@@ -169,20 +169,20 @@ module.exports = () => {
             currentExtractedProjectFolder = currentExtractedProjectFolder.slice(0, -1);
 
         let command = "./gradlew";
-        let arguments = ['assembleDebug', '--stacktrace'];
+        let params = ['assembleDebug', '--stacktrace'];
         // If our platform is Windows. We will run *.bat file
         if (process.platform === "win32")
             command = "gradlew.bat";
         else {
             // We execute chmod in order to have an access to executable bash script
             fs.chmodSync(`${currentExtractedProjectFolder}`, '755');
-            
-            arguments.unshift(command);
+
+            params.unshift(command);
             command = "sudo";
         }
             
         console.log(currentExtractedProjectFolder);
-        let gradlew = spawn(command, arguments, {cwd: `${currentExtractedProjectFolder}`});
+        let gradlew = spawn(command, params, {cwd: `${currentExtractedProjectFolder}`});
 
         gradlew.stdout.on('data', (data) => {
             console.log("stdout: " + data);
