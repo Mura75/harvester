@@ -18,7 +18,7 @@ const CONDITION_LAUNCH_APP = 5;
 
 
 
-const BASE_URL = "http://localhost:5555";
+const BASE_URL = "http://localhost:7777";
 
 class App extends Component{
     constructor(props) {

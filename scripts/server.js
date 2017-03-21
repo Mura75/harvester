@@ -15,7 +15,7 @@ module.exports = () => {
     const execSync = child_process.execSync;
     const spawn = child_process.spawn;
     
-    const PORT = 5555;
+    const PORT = 7777;
     const DOWNLOADS_FOLDER = `${__dirname}/../downloads`;
 
     let ANDROID_HOME = "";
@@ -42,7 +42,7 @@ module.exports = () => {
      */
     app.get('/android_path', (req, res) => {
         ANDROID_HOME = process.env.ANDROID_HOME;
-
+        
         if (!ANDROID_HOME) {
             res.json({status: 'error', data: 'ANDROID_PATH does not exist'})
             return;

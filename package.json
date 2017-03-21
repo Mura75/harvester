@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-    "build": "webpack --progress --colors --config webpack.config.js",
+    "webpack-build": "webpack --progress --colors --config webpack.config.js",
+    "build": "electron-packager . --out=./build/ --ignore=downloads",
     "webpack-devserver": "webpack-dev-server --debug --hot --devtool eval-source-map --watch-poll --colors --inline --port 8050 --host 0.0.0.0",
     "web": "babel-node ./scripts/test_server.js --presets es2015,stage-0"
   },
@@ -29,6 +30,7 @@
     "babel-loader": "^6.2.10",
     "babel-register": "^6.18.0",
     "electron": "^1.4.14",
+    "electron-packager": "^8.6.0",
     "webpack": "^1.14.0",
     "webpack-dev-server": "^1.16.2",
     "webpack-notifier": "^1.5.0"

@@ -117,3 +117,8 @@ secret.json
 public
 
 downloads
+
+*.zip
+
+# builds
+harvester-win32-x64
