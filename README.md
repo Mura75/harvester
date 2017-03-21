@@ -1,6 +1,6 @@
 # Harvester
 
-Launches Android libs example applications hosted on github.
+Launches Android libs example applications hosted on github. Currently this project can work with only github projects and root folder of these projects must have `gradlew`, `build.gradle` and `settings.gradle` files.
 
 <p align="center">
     <img src="readme-media/demo1.gif" width="100%" />
@@ -19,7 +19,7 @@ Before starting to work with this project your local machine should have:
 * JDK 8 with `JAVA_HOME` in your environment variable
 * Android SDK, with installed SDK build tools and `ANDROID_HOME` in your environment variable. Also `$ANDROID_HOME/tools` and `$ANDROID_HOME/platform-tools` should also be in `PATH` environment variable
 
-** Both Pre-build and source projects should be placed in folder with short path length to avoid Android build errors! **
+**Both Pre-build and source projects should be placed in folder with short path length to avoid Android build errors!**
 
 ### Pre-build projects
 
@@ -69,6 +69,7 @@ npm run webpack-build
 // This command will generate final desktop version of this project in /build folder
 npm run build
 ```
+
 
 ### Contributing
 
