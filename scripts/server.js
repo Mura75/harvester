@@ -8,21 +8,20 @@ import request from 'request';
 import AdmZip from 'adm-zip';
 import fs from 'fs';
 
-
 module.exports = () => {
     
     const app = express();
     const exec = child_process.exec;
     const execSync = child_process.execSync;
     const spawn = child_process.spawn;
-
+    
     const PORT = 5555;
     const DOWNLOADS_FOLDER = `${__dirname}/../downloads`;
 
     let ANDROID_HOME = "";
     let currentExtractedProjectFolder = "picasso-master";
 
-
+    
     let allowCrossDomainLocalhost = (req, res, next) => {
         res.header('Access-Control-Allow-Origin', '*');
         res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
